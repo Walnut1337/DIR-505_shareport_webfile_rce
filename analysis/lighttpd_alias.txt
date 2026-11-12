@@ -1,0 +1,23 @@
+# lighttpd-ws configuration relevant to the SharePort CGI
+#
+# Source: firmware rootfs mnt/lighttpd/conf.d/cgi-ws.conf
+# server_root = "/www/webfile_access/"
+
+cgi.assign = (
+    "webfile_cgi.cgi" => server_root + "webfile_cgi.cgi",
+    "my_cgi.cgi"      => server_root + "my_cgi.cgi"
+)
+
+alias.url += (
+    "/dws/api/AddDir"      => server_root + "webfile_cgi.cgi",
+    "/dws/api/DelFile"     => server_root + "webfile_cgi.cgi",
+    "/dws/api/ListDir"     => server_root + "webfile_cgi.cgi",
+    "/dws/api/ListFile"    => server_root + "webfile_cgi.cgi",
+    "/dws/api/ListRoot"    => server_root + "webfile_cgi.cgi",
+    "/dws/api/UploadFile"  => server_root + "webfile_cgi.cgi",
+    "/dws/api/ListCategory"=> server_root + "webfile_cgi.cgi",
+    "/dws/api/Login"       => server_root + "webfile_cgi.cgi"
+)
+
+# Listener: lighttpd-ws on TCP/8181.
+# The CGI runs as root; get_input_entries is reached before session checks.

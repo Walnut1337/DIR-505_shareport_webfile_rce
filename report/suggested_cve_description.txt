@@ -1,0 +1,69 @@
+=== SHORT DESCRIPTION (100-word style) ===
+
+D-Link DIR-505 A1 firmware 1.10B02 exposes SharePort Web File Access on TCP/8181
+(/usr/bin/webfile_cgi.cgi, running as root). Its get_input_entries() form parser writes
+POST body bytes into main()'s stack frame with a fixed 0x425 stride and no bounds check.
+An unauthenticated POST to /dws/api/ListRoot overwrites main()'s $ra with the fixed
+.system PLT address 0x40d180, so a crafted form body executes arbitrary commands as root.
+No Cookie, session, HNAP credential, or admin password is required. The exploit is
+independent of ASLR because webfile_cgi.cgi is non-PIE.
+
+=== LONG DESCRIPTION ===
+
+A pre-authentication stack-based buffer overflow was identified in the SharePort Web File
+Access CGI of D-Link DIR-505 A1 firmware 1.10B02.
+
+Affected component:
+- /usr/bin/webfile_cgi.cgi
+- MD5 28cb86cc8b93ba2e4a47c6261403b5ce, 64872 bytes
+- served by lighttpd-ws on TCP/8181 and executed as root
+- firmware DIR-505_A1_FW110B02.bin, MD5 cd13a30e3f971c23eace3ae94380f28b
+
+Root cause:
+main() passes a stack buffer to get_input_entries(). The parser reads CONTENT_LENGTH
+bytes from stdin and stores every byte using:
+  buf[offset + field * 0x425]          for a form name
+  buf[offset + field * 0x425 + 0x24]   for a form value
+Neither field nor offset is checked against the destination size. A body longer than the
+buffer writes into main()'s saved registers and return address.
+
+Exploitation:
+A POST to /dws/api/ListRoot with 49 '&' separators places the next field at index 49.
+The following 1051-byte value overwrites main()'s saved $ra:
+  0x00 + "A"*1026 + 5 * p32(0) + p32(0x40d180)
+0x40d180 is the .system PLT stub in this non-PIE binary. On return, the uClibc strcmp
+delay-slot effect leaves $a0 pointing to field0_value + 1, which is the command after the
+leading '0' in "x=0<cmd>". The result is system(<cmd>) as root.
+
+Authentication:
+The parser runs before any Cookie/session check. The request needs no Cookie, no session,
+no HNAP Basic credential, and no admin password. The HTTP response may be 200 or 500
+because the CGI stack frame is corrupted, but the command executes.
+
+Verified impact:
+On a real DIR-505 A1 (192.168.0.1, firmware 1.10B02), the PoC returned:
+  Uid: 0 0 0 0
+  Gid: 0 0 0 0
+  CapEff: fffffffffffffeff
+It also ran uname -a and ls successfully. Output is written under /www/webfile_access and
+retrieved from TCP/8181; TCP/80 is not used.
+
+Classification:
+CWE-121 (Stack-based Buffer Overflow), CWE-78 (OS Command Injection).
+CVSS 3.1: AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H (9.8 Critical).
+
+Affected product:
+- D-Link DIR-505 A1 firmware 1.10B02.
+
+Prior art / duplicate note:
+The same get_input_entries root cause was publicly analyzed in 2019 for my_cgi.cgi on
+TCP/80 (storage_path, offset 477472, ROP 0x405B1C, firmware 1.08B10). This report is for a
+different binary, port, route, offset, and firmware:
+  webfile_cgi.cgi / TCP 8181 / /dws/api/ListRoot / $ra=0x40d180 / firmware 1.10B02.
+It is not CVE-2014-3936 (HNAP Content-Length overflow) and not CVE-2016-5681 (SharePort
+cookie overflow).
+
+Remediation:
+Restrict TCP/8181 to the LAN, disable SharePort Web File Access, add field/offset bounds
+checks in get_input_entries, enforce a maximum CONTENT_LENGTH, and authenticate
+/dws/api/*. DIR-505 is EOL; replace the device.

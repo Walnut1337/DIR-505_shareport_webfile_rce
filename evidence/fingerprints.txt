@@ -1,0 +1,8 @@
+Firmware MD5: cd13a30e3f971c23eace3ae94380f28b
+Firmware: DIR-505_A1_FW110B02.bin
+Component: /usr/bin/webfile_cgi.cgi
+Component MD5: 28cb86cc8b93ba2e4a47c6261403b5ce
+Component size: 64872 bytes
+Service: lighttpd-ws, TCP/8181, runs as root
+Kernel: Linux 2.6.31--LSDK-9.2.0_U9.915
+Architecture: MIPS32 big-endian, non-PIE

